@@ -28,8 +28,9 @@ def create_queue():
 def subscribe_sns(queue):
     """Subscribes the SNS topic to the queue."""
     conn = sns.connect_to_region(CONFIG['region'])
-    subscription = conn.subscribe_sqs_queue(CONFIG['sns_topic'], queue)
-    return conn, subscription
+    sub = conn.subscribe_sqs_queue(CONFIG['sns_topic'], queue)
+    sns_arn = sub['SubscribeResponse']['SubscribeResult']['SubscriptionArn']
+    return conn, sns_arn
 
 
 def should_terminate(msg):
@@ -41,7 +42,7 @@ def should_terminate(msg):
         and INSTANCE_ID == body['EC2InstanceId']
 
 
-def death_row(sns_conn, conn, queue):
+def death_row(sns_conn, sns_arn, conn, queue):
     """Poll sqs until we get a termination message."""
     while True:
         message = queue.read()
@@ -49,6 +50,6 @@ def death_row(sns_conn, conn, queue):
             conn.delete_message(queue, message)
             if should_terminate(message):
                 queue.delete()
-                sns_conn.unsubscribe(CONFIG['sns_topic'])
+                sns_conn.unsubscribe(sns_arn)
                 return requests.get(CONFIG['endpoint'])
         time.sleep(3)

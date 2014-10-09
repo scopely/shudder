@@ -45,5 +45,6 @@ on your server and it can pick it up that way, otherwise it'll look for a
 
 ## Permissions
 
-Your credentials need to be able to subscribe and unsubscribe from your sns
-topic, as well as create and read from sqs queues under the prefix configured.
+Your credentials need to be able to subscribe to your sns
+topic, unsubscribe from your subscription ARN,
+as well as create and read from sqs queues under the prefix configured.
