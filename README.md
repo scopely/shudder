@@ -40,7 +40,7 @@ on your server and it can pick it up that way, otherwise it'll look for a
 `~/.boto` config or environment variables for `AWS_ACCESS_KEY_ID` and
 `AWS_SECRET_ACCESS_KEY`.
 
-*This project has to be ran on an ec2 instance because it looks up the instance
+*This project has to be run on an ec2 instance because it looks up the instance
  id in the instance metadata. It'll break anywhere but on ec2.*
 
 ## Permissions
