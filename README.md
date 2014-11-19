@@ -48,3 +48,40 @@ on your server and it can pick it up that way, otherwise it'll look for a
 Your credentials need to be able to subscribe to your sns
 topic, unsubscribe from your subscription ARN,
 as well as create and read from sqs queues under the prefix configured.
+
+### Example IAM Role
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "sqs:*"
+      ],
+      "Resource": [
+        "arn:aws:sqs:*:0123456789:*:*"
+      ],
+      "Effect": "Allow"
+    },
+    {
+      "Action": [
+        "sns:Unsubscribe"
+      ],
+      "Resource": [
+        "*"
+      ],
+      "Effect": "Allow"
+    },
+    {
+      "Action": [
+        "sns:Subscribe"
+      ],
+      "Resource": [
+        "arn:aws:sns:us-east-1:0123456789:*"
+      ],
+      "Effect": "Allow"
+    }
+  ]
+}
+```
