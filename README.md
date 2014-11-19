@@ -49,7 +49,7 @@ Your credentials need to be able to subscribe to your sns
 topic, unsubscribe from your subscription ARN,
 as well as create and read from sqs queues under the prefix configured.
 
-### Example IAM Role
+### Example IAM Role for Instance running Shudder
 
 ```json
 {
@@ -81,6 +81,55 @@ as well as create and read from sqs queues under the prefix configured.
         "arn:aws:sns:us-east-1:0123456789:*"
       ],
       "Effect": "Allow"
+    }
+  ]
+}
+```
+
+## Enabling lifecycle hooks
+Unfortunately, lifecycle hooks cannot be managed from CloudFormation or from the web console. To set up a hook, you may need to use the CLI as follows:
+
+```bash
+aws autoscaling put-lifecycle-hook 
+  --lifecycle-hook-name really-cool-hook-name
+  --auto-scaling-group-name my-asg-name 
+  --lifecycle-transition autoscaling:EC2_INSTANCE_TERMINATING 
+  --role-arn arn:aws:iam::0123456789:role/autoscaling-lifecycle-sqs 
+  --notification-target-arn arn:aws:sns:us-east-1:0123456789:instance-shutdowns 
+  --heartbeat-timeout 300 
+  --default-result CONTINUE
+```
+
+The specified role must have the right to publish to the specified topic:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "sns:Publish"
+      ],
+      "Resource": "arn:aws:sns:us-east-1:0123456789:instance-shutdowns"
+    }
+  ]
+}
+```
+
+This role must be assumable by the autoscaling service, with a trust relationship policy like this:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "autoscaling.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
     }
   ]
 }
