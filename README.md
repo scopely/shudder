@@ -6,11 +6,11 @@ groups.
 It works by making use of
 [Lifecycle Hooks](http://docs.aws.amazon.com/cli/latest/reference/autoscaling/put-lifecycle-hook.html). You
 give your autoscaling group a lifecycle hook that publishes to an sns topic that
-you configure in shudder. When shudder starts up, it will create an sqs queue
-for the instance it is running on and subscribe it to the sns topic. It polls
+you configure in shudder. When shudder starts up, it will create an SQS queue
+for the instance it is running on and subscribe it to the SNS topic. It polls
 for new messages and waits for one that is a termination command for this
-instance, and sends a get request to a configured endpoint telling it to
-shutdown gracefully.
+instance, and sends a GET request to a configured endpoint telling it to
+shut down gracefully.
 
 ## Usage
 
