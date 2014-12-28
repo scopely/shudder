@@ -5,7 +5,7 @@ groups.
 
 It works by making use of
 [Lifecycle Hooks](http://docs.aws.amazon.com/cli/latest/reference/autoscaling/put-lifecycle-hook.html). You
-give your autoscaling group a lifecycle hook that publishes to an sns topic that
+give your autoscaling group a lifecycle hook that publishes to an SNS topic that
 you configure in shudder. When shudder starts up, it will create an SQS queue
 for the instance it is running on and subscribe it to the SNS topic. It polls
 for new messages and waits for one that is a termination command for this
@@ -40,14 +40,14 @@ on your server and it can pick it up that way, otherwise it'll look for a
 `~/.boto` config or environment variables for `AWS_ACCESS_KEY_ID` and
 `AWS_SECRET_ACCESS_KEY`.
 
-*This project has to be run on an ec2 instance because it looks up the instance
- id in the instance metadata. It'll break anywhere but on ec2.*
+*This project has to be run on an EC2 instance because it looks up the instance
+ ID in the instance metadata. It'll break anywhere but on EC2.*
 
 ## Permissions
 
-Your credentials need to be able to subscribe to your sns
+Your credentials need to be able to subscribe to your SNS
 topic, unsubscribe from your subscription ARN,
-as well as create and read from sqs queues under the prefix configured.
+as well as create and read from SQS queues under the prefix configured.
 
 ### Example IAM Role for Instance running Shudder
 
