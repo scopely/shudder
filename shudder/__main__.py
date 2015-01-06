@@ -12,11 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Start the server and whatnot."""
+"""Start polling of SQS and metadata."""
 import shudder.queue as queue
+import shudder.metadata as metadata
+from shudder.config import CONFIG
+
+import time
+import requests
 
 
 if __name__ == '__main__':
-    conn, sqsq = queue.create_queue()
-    sns_conn, sub = queue.subscribe_sns(sqsq)
-    queue.death_row(sns_conn, sub, conn, sqsq)
+    sqs_connection, sqs_queue = queue.create_queue()
+    sns_connection, subscription_arn = queue.subscribe_sns(sqs_queue)
+    while True:
+        if queue.poll_queue(sns_connection, sqs_queue) \
+                or metadata.poll_instance_metadata():
+            queue.clean_up_sns(sns_connection, subscription_arn, sqs_queue)
+            requests.get(CONFIG["endpoint"])
+            break
+        time.sleep(5)

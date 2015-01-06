@@ -12,6 +12,11 @@ for new messages and waits for one that is a termination command for this
 instance, and sends a GET request to a configured endpoint telling it to
 shut down gracefully.
 
+It can also detect when a spot instance has been scheduled for termination, 
+using the [instance termination notice](https://aws.amazon.com/blogs/aws/new-ec2-spot-instance-termination-notices/) 
+available in instance metadata. The same configured endpoint will be hit if
+a scheduled termination of a spot instance is detected.
+
 ## Usage
 
 Install it!

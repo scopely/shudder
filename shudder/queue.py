@@ -18,11 +18,11 @@ impending doom.
 
 """
 import json
-import time
-import requests
+
 from boto.utils import get_instance_metadata
 import boto.sns as sns
 import boto.sqs as sqs
+
 from shudder.config import CONFIG
 
 
@@ -32,7 +32,7 @@ QUEUE_NAME = "{prefix}-{id}".format(prefix=CONFIG['sqs_prefix'],
 
 
 def create_queue():
-    """Creates the sqs queue and returns the connection/queue"""
+    """Creates the SQS queue and returns the connection/queue"""
     conn = sqs.connect_to_region(CONFIG['region'])
     queue = conn.create_queue(QUEUE_NAME)
     queue.set_timeout(60 * 60)  # one hour
@@ -56,14 +56,16 @@ def should_terminate(msg):
         and INSTANCE_ID == body['EC2InstanceId']
 
 
-def death_row(sns_conn, sns_arn, conn, queue):
-    """Poll sqs until we get a termination message."""
-    while True:
-        message = queue.read()
-        if message:
-            conn.delete_message(queue, message)
-            if should_terminate(message):
-                queue.delete()
-                sns_conn.unsubscribe(sns_arn)
-                return requests.get(CONFIG['endpoint'])
-        time.sleep(3)
+def clean_up_sns(sns_conn, sns_arn, queue):
+    """Clean up SNS subscription and SQS queue"""
+    queue.delete()
+    sns_conn.unsubscribe(sns_arn)
+
+
+def poll_queue(conn, queue):
+    """Poll SQS until we get a termination message."""
+    message = queue.read()
+    if message:
+        conn.delete_message(queue, message)
+        return should_terminate(message)
+    return False
