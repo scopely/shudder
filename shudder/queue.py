@@ -67,6 +67,5 @@ def poll_queue(conn, queue):
     message = queue.read()
     if message:
         conn.delete_message(queue, message)
-        if should_terminate(message):
-            return True
+        return should_terminate(message)
     return False
