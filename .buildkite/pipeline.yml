@@ -10,4 +10,4 @@ steps:
     command: "buildkite-scripts/scripts/deb-s3.sh"
     env:
       APT_REPO_NAME: shared
-      ENVIRONMENT_NAME: " "
+      ENVIRONMENT_NAME: "0"
