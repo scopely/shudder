@@ -9,8 +9,8 @@ give your autoscaling group a lifecycle hook that publishes to an SNS topic that
 you configure in shudder. When shudder starts up, it will create an SQS queue
 for the instance it is running on and subscribe it to the SNS topic. It polls
 for new messages and waits for one that is a termination command for this
-instance, and sends a GET request to a configured endpoint telling it to
-shut down gracefully.
+instance. It can then send a GET request to a configured endpoint telling it to
+shut down gracefully, or execute commands.
 
 It can also detect when a spot instance has been scheduled for termination, 
 using the [instance termination notice](https://aws.amazon.com/blogs/aws/new-ec2-spot-instance-termination-notices/) 
@@ -32,6 +32,7 @@ sqs_prefix = "myapp"
 region = "us-east-1"
 sns_topic = "arn:aws:sns:us-east-1:723456455537:myapp-shutdowns"
 endpoint = "http://127.0.0.1:5000/youaregoingtodiesoon"
+commands = [["//etc/init.d/nginx", "stop"], ["/etc/init.d/filebeats", "stop"]]
 ```
 
 You can specify the config file path as an environment variable:

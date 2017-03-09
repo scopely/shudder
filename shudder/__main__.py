@@ -19,15 +19,25 @@ from shudder.config import CONFIG
 
 import time
 import requests
-
+import subprocess
 
 if __name__ == '__main__':
     sqs_connection, sqs_queue = queue.create_queue()
     sns_connection, subscription_arn = queue.subscribe_sns(sqs_queue)
     while True:
-        if queue.poll_queue(sns_connection, sqs_queue) \
-                or metadata.poll_instance_metadata():
+        message = queue.poll_queue(sqs_connection, sqs_queue)
+        if message or metadata.poll_instance_metadata():
             queue.clean_up_sns(sns_connection, subscription_arn, sqs_queue)
-            requests.get(CONFIG["endpoint"])
+            if 'endpoint' in CONFIG:
+                requests.get(CONFIG["endpoint"])
+            if 'commands' in CONFIG:
+                for command in CONFIG["commands"]:
+                    process = subprocess.Popen(command)
+                    while process.poll() is not None:
+                        time.sleep(30)
+                        """Send a heart beat to aws"""
+                        queue.record_lifecycle_action_heartbeat(message)
+            """Send a complete lifecycle action"""
+            queue.complete_lifecycle_action(message)
             break
         time.sleep(5)
