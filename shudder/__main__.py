@@ -33,7 +33,7 @@ if __name__ == '__main__':
             if 'commands' in CONFIG:
                 for command in CONFIG["commands"]:
                     process = subprocess.Popen(command)
-                    while process.poll() is not None:
+                    while process.poll() is None:
                         time.sleep(30)
                         """Send a heart beat to aws"""
                         queue.record_lifecycle_action_heartbeat(message)
