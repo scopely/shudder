@@ -25,7 +25,7 @@ import subprocess
 import sys
 
 def receive_signal(signum, stack):
-    if signum in [1,2,3,15,17]:
+    if signum in [1,2,3,15]:
         print 'Caught signal %s, exiting.' %(str(signum))
         sys.exit()
     else:
