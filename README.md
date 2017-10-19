@@ -12,8 +12,8 @@ for new messages and waits for one that is a termination command for this
 instance. It can then send a GET request to a configured endpoint telling it to
 shut down gracefully, or execute commands.
 
-It can also detect when a spot instance has been scheduled for termination, 
-using the [instance termination notice](https://aws.amazon.com/blogs/aws/new-ec2-spot-instance-termination-notices/) 
+It can also detect when a spot instance has been scheduled for termination,
+using the [instance termination notice](https://aws.amazon.com/blogs/aws/new-ec2-spot-instance-termination-notices/)
 available in instance metadata. The same configured endpoint will be hit if
 a scheduled termination of a spot instance is detected.
 
@@ -63,6 +63,14 @@ as well as create and read from SQS queues under the prefix configured.
   "Statement": [
     {
       "Action": [
+        "autoscaling:RecordLifecycleActionHeartbeat",
+        "autoscaling:CompleteLifecycleAction"
+      ],
+      "Resource": "arn:aws:autoscaling:*:*:*",
+      "Effect": "Allow"
+    },
+    {
+      "Action": [
         "sqs:*"
       ],
       "Resource": [
@@ -96,13 +104,13 @@ as well as create and read from SQS queues under the prefix configured.
 Unfortunately, lifecycle hooks cannot be managed from CloudFormation or from the web console. To set up a hook, you may need to use the CLI as follows:
 
 ```bash
-aws autoscaling put-lifecycle-hook 
+aws autoscaling put-lifecycle-hook
   --lifecycle-hook-name really-cool-hook-name
-  --auto-scaling-group-name my-asg-name 
-  --lifecycle-transition autoscaling:EC2_INSTANCE_TERMINATING 
-  --role-arn arn:aws:iam::0123456789:role/autoscaling-lifecycle-sqs 
-  --notification-target-arn arn:aws:sns:us-east-1:0123456789:instance-shutdowns 
-  --heartbeat-timeout 300 
+  --auto-scaling-group-name my-asg-name
+  --lifecycle-transition autoscaling:EC2_INSTANCE_TERMINATING
+  --role-arn arn:aws:iam::0123456789:role/autoscaling-lifecycle-sqs
+  --notification-target-arn arn:aws:sns:us-east-1:0123456789:instance-shutdowns
+  --heartbeat-timeout 300
   --default-result CONTINUE
 ```
 

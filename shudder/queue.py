@@ -45,7 +45,7 @@ def subscribe_sns(queue):
     statement_id = hashlib.md5((CONFIG['sns_topic'] +  queue.attributes.get('QueueArn')).encode('utf-8')).hexdigest()
     statement_id_exists = False
     existing_policy = queue.attributes.get('Policy')
-    if existing_policy: 
+    if existing_policy:
         policy = json.loads(existing_policy)
     else:
         policy = {}
@@ -79,7 +79,7 @@ def should_terminate(msg):
     message = json.loads(first_box['Message'])
     termination_msg = 'autoscaling:EC2_INSTANCE_TERMINATING'
 
-    if message['LifecycleTransition'] == termination_msg and INSTANCE_ID == message['EC2InstanceId']:
+    if 'LifecycleTransition' in message and message['LifecycleTransition'] == termination_msg and INSTANCE_ID == message['EC2InstanceId']:
         return message
     else:
         return None
