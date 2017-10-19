@@ -48,6 +48,7 @@ if __name__ == '__main__':
                 requests.get(CONFIG["endpoint"])
             if 'commands' in CONFIG:
                 for command in CONFIG["commands"]:
+                    print 'Running command: %s' % command
                     process = subprocess.Popen(command)
                     while process.poll() is None:
                         time.sleep(30)
@@ -55,5 +56,5 @@ if __name__ == '__main__':
                         queue.record_lifecycle_action_heartbeat(message)
             """Send a complete lifecycle action"""
             queue.complete_lifecycle_action(message)
-            break
+            sys.exit(0)
         time.sleep(5)
