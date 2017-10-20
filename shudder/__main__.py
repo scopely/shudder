@@ -46,6 +46,9 @@ if __name__ == '__main__':
             queue.clean_up_sns(sns_connection, subscription_arn, sqs_queue)
             if 'endpoint' in CONFIG:
                 requests.get(CONFIG["endpoint"])
+            if 'endpoints' in CONFIG:
+                for endpoint in CONFIG["endpoints"]:
+                    requests.get(endpoint)
             if 'commands' in CONFIG:
                 for command in CONFIG["commands"]:
                     print 'Running command: %s' % command
