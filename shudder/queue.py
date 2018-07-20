@@ -34,6 +34,10 @@ def create_queue():
     """Creates the SQS queue and returns the queue url and metadata"""
     conn = boto3.client('sqs', region_name=CONFIG['region'])
     queue_metadata = conn.create_queue(QueueName=QUEUE_NAME, Attributes={'VisibilityTimeout':'3600'})
+
+    if 'queue_tags' in CONFIG:
+        conn.tag_queue(QueueUrl=queue_metadata['QueueUrl'], Tags=CONFIG['queue_tags'])
+
     """Get the SQS queue object from the queue URL"""
     sqs = boto3.resource('sqs', region_name=CONFIG['region'])
     queue = sqs.Queue(queue_metadata['QueueUrl'])

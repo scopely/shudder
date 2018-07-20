@@ -33,7 +33,25 @@ region = "us-east-1"
 sns_topic = "arn:aws:sns:us-east-1:723456455537:myapp-shutdowns"
 endpoints = ["http://127.0.0.1:5000/youaregoingtodiesoon", "http://127.0.0.1:5001/shutdown"]
 commands = [["//etc/init.d/nginx", "stop"], ["/etc/init.d/filebeats", "stop"]]
+queue_tags = { tag1 = "value1", tag2 = "value2"}
 ```
+
+**sqs_prefix:** specifies the prefix of the sqs queue that will be created for the instance.
+Queues are named by concatenating the prefix to the instance id.
+
+**region:** specifies the AWS region
+
+**sns_topic:** specifies the arn of the SNS Topic that publishes lifecycle events for this
+instance's auto scaling group
+
+**endpoints:** specifies a list of http endpoints that shudder will execute a GET request on once
+shudder has received the shutdown lifecycle message
+
+**commands:** specifies a list of commands that shudder will execute once shudder has received the
+shutdown lifecycle message
+
+**queue_tags:** the aws resource tags to assign to the SQS queue that is created by Shudder for the
+instance its running on
 
 You can specify the config file path as an environment variable:
 
