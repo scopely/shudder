@@ -17,9 +17,10 @@
 """
 import requests
 import logging
-from config import LOG_FILE
+from shudder.config import CONFIG
 
-logging.basicConfig(filename=LOG_FILE,format='%(asctime)s %(levelname)s:%(message)s',level=logging.INFO)
+
+logging.basicConfig(filename=CONFIG['logfile'],format='%(asctime)s %(levelname)s:%(message)s',level=logging.INFO)
 termination_time = "http://169.254.169.254/latest/meta-data/spot/termination-time"
 instance_id = "http://169.254.169.254/latest/meta-data/instance-id"
 
@@ -29,7 +30,7 @@ def poll_instance_metadata():
       r = requests.get(termination_time)
       return r.status_code < 400
     except:
-      logging.error('Request to ' + termination_time + ' failed.')
+      logging.exception('Request to ' + termination_time + ' failed.')
 
 def get_instance_id():
     """Check instance metadata for an instance id"""
@@ -37,4 +38,4 @@ def get_instance_id():
       r = requests.get(instance_id)
       return r.text
     except:
-      logging.error('Request to ' + instance_id + ' failed.')
+      logging.exception('Request to ' + instance_id + ' failed.')

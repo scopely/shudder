@@ -16,7 +16,6 @@
 import shudder.queue as queue
 import shudder.metadata as metadata
 from shudder.config import CONFIG
-from shudder.config import LOG_FILE
 import time
 import os
 import requests
@@ -24,7 +23,9 @@ import signal
 import subprocess
 import sys
 import logging
-logging.basicConfig(filename=LOG_FILE,format='%(asctime)s %(levelname)s:%(message)s',level=logging.INFO)
+from requests.exceptions import ConnectionError
+
+logging.basicConfig(filename=CONFIG['logfile'],format='%(asctime)s %(levelname)s:%(message)s',level=logging.INFO)
 
 
 def receive_signal(signum, stack):
@@ -66,6 +67,6 @@ if __name__ == '__main__':
             sys.exit(0)
         time.sleep(5)
       except ConnectionError:
-        logging.error('Connection issue')
+        logging.exception('Connection issue')
       except:
-        logging.error('Something went wrong')
+        logging.exception('Something went wrong')
