@@ -15,7 +15,7 @@
 """Start polling of SQS and metadata."""
 import shudder.queue as queue
 import shudder.metadata as metadata
-from shudder.config import CONFIG
+from shudder.config import CONFIG, LOG_FILE
 import time
 import os
 import requests
@@ -25,15 +25,14 @@ import sys
 import logging
 from requests.exceptions import ConnectionError
 
-logging.basicConfig(filename=CONFIG['logfile'],format='%(asctime)s %(levelname)s:%(message)s',level=logging.INFO)
+logging.basicConfig(filename=LOG_FILE,format='%(asctime)s %(levelname)s:%(message)s',level=logging.INFO)
 
 
 def receive_signal(signum, stack):
     if signum in [1,2,3,15]:
         print 'Caught signal %s, exiting.' %(str(signum))
         sys.exit()
-    else:
-        print 'Caught signal %s, ignoring.' %(str(signum))
+    else:        print 'Caught signal %s, ignoring.' %(str(signum))
 
 if __name__ == '__main__':
     uncatchable = ['SIG_DFL','SIGSTOP','SIGKILL']

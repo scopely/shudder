@@ -17,10 +17,10 @@
 """
 import requests
 import logging
-from shudder.config import CONFIG
+from shudder.config import CONFIG, LOG_FILE
 
 
-logging.basicConfig(filename=CONFIG['logfile'],format='%(asctime)s %(levelname)s:%(message)s',level=logging.INFO)
+logging.basicConfig(filename=LOG_FILE,format='%(asctime)s %(levelname)s:%(message)s',level=logging.INFO)
 termination_time = "http://169.254.169.254/latest/meta-data/spot/termination-time"
 instance_id = "http://169.254.169.254/latest/meta-data/instance-id"
 
