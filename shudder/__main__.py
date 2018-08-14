@@ -15,21 +15,24 @@
 """Start polling of SQS and metadata."""
 import shudder.queue as queue
 import shudder.metadata as metadata
-from shudder.config import CONFIG
-
+from shudder.config import CONFIG, LOG_FILE
 import time
 import os
 import requests
 import signal
 import subprocess
 import sys
+import logging
+from requests.exceptions import ConnectionError
+
+logging.basicConfig(filename=LOG_FILE,format='%(asctime)s %(levelname)s:%(message)s',level=logging.INFO)
+
 
 def receive_signal(signum, stack):
     if signum in [1,2,3,15]:
         print 'Caught signal %s, exiting.' %(str(signum))
         sys.exit()
-    else:
-        print 'Caught signal %s, ignoring.' %(str(signum))
+    else:        print 'Caught signal %s, ignoring.' %(str(signum))
 
 if __name__ == '__main__':
     uncatchable = ['SIG_DFL','SIGSTOP','SIGKILL']
@@ -41,6 +44,7 @@ if __name__ == '__main__':
     sqs_connection, sqs_queue = queue.create_queue()
     sns_connection, subscription_arn = queue.subscribe_sns(sqs_queue)
     while True:
+      try:
         message = queue.poll_queue(sqs_connection, sqs_queue)
         if message or metadata.poll_instance_metadata():
             queue.clean_up_sns(sns_connection, subscription_arn, sqs_queue)
@@ -61,3 +65,7 @@ if __name__ == '__main__':
             queue.complete_lifecycle_action(message)
             sys.exit(0)
         time.sleep(5)
+      except ConnectionError:
+        logging.exception('Connection issue')
+      except:
+        logging.exception('Something went wrong')
