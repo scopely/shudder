@@ -43,7 +43,9 @@ if __name__ == '__main__':
 
     sqs_connection, sqs_queue = queue.create_queue()
     sns_connection, subscription_arn = queue.subscribe_sns(sqs_queue)
-    while True:
+
+    running = True
+    while running:
       try:
         message = queue.poll_queue(sqs_connection, sqs_queue)
         if message or metadata.poll_instance_metadata():
@@ -63,9 +65,11 @@ if __name__ == '__main__':
                         queue.record_lifecycle_action_heartbeat(message)
             """Send a complete lifecycle action"""
             queue.complete_lifecycle_action(message)
-            sys.exit(0)
+            running = False
         time.sleep(5)
       except ConnectionError:
         logging.exception('Connection issue')
       except:
         logging.exception('Something went wrong')
+    logging.info('Success')
+    sys.exit(0)
