@@ -62,7 +62,12 @@ if __name__ == '__main__':
                     while process.poll() is None:
                         time.sleep(30)
                         """Send a heart beat to aws"""
-                        queue.record_lifecycle_action_heartbeat(message)
+                        try:
+                          queue.record_lifecycle_action_heartbeat(message)
+                        except:
+                          logging.exception('Error sending hearbeat for')
+                          logging.info(message)
+                        
             """Send a complete lifecycle action"""
             queue.complete_lifecycle_action(message)
             running = False
