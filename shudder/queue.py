@@ -122,7 +122,10 @@ def poll_queue(conn, queue):
     """Poll SQS until we get a termination message."""
     logging.info("polling sqs queue")
     messages = queue.receive_messages()
+
     for message in messages:
         message.delete()
-        return should_terminate(message)
+        if should_terminate(message):
+            return True
+
     return False
