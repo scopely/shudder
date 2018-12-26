@@ -36,6 +36,7 @@ def get_instance_id():
     """Check instance metadata for an instance id"""
     try:
       r = requests.get(instance_id)
+      logging.info("instance id is " + str(r.text))
       return r.text
     except:
       logging.exception('Request to ' + instance_id + ' failed.')

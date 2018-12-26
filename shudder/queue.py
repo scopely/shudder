@@ -20,10 +20,12 @@ impending doom.
 import json
 import boto3
 import hashlib
+import logging
 
-from shudder.config import CONFIG
+from shudder.config import CONFIG, LOG_FILE
 import shudder.metadata as metadata
 
+logging.basicConfig(filename=LOG_FILE,format='%(asctime)s %(levelname)s:%(message)s',level=logging.INFO)
 
 INSTANCE_ID = metadata.get_instance_id()
 QUEUE_NAME = "{prefix}-{id}".format(prefix=CONFIG['sqs_prefix'],
@@ -81,6 +83,7 @@ def should_terminate(msg):
     """Check if the termination message is about our instance"""
     first_box = json.loads(msg.body)
     message = json.loads(first_box['Message'])
+    logging.info("received termination message " + str(message))
     termination_msg = 'autoscaling:EC2_INSTANCE_TERMINATING'
 
     if 'LifecycleTransition' in message and message['LifecycleTransition'] == termination_msg and INSTANCE_ID == message['EC2InstanceId']:
@@ -117,6 +120,7 @@ def complete_lifecycle_action(message):
 
 def poll_queue(conn, queue):
     """Poll SQS until we get a termination message."""
+    logging.info("polling sqs queue")
     messages = queue.receive_messages()
     for message in messages:
         message.delete()
