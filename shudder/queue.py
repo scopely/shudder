@@ -48,7 +48,7 @@ def create_queue():
 
 def subscribe_sns(queue):
     """Attach a policy to allow incoming connections from SNS"""
-    statement_id = hashlib.md5((CONFIG['sns_topic'] +  queue.attributes.get('QueueArn')).encode('utf-8')).hexdigest()
+    statement_id = hashlib.md5((CONFIG['sns_topic'] + queue.attributes.get('QueueArn')).encode('utf-8')).hexdigest()
     statement_id_exists = False
     existing_policy = queue.attributes.get('Policy')
     if existing_policy:
@@ -82,8 +82,8 @@ def subscribe_sns(queue):
 def should_terminate(msg):
     """Check if the termination message is about our instance"""
     first_box = json.loads(msg.body)
+    logging.info("received termination message " + str(first_box))
     message = json.loads(first_box['Message'])
-    logging.info("received termination message " + str(message))
     termination_msg = 'autoscaling:EC2_INSTANCE_TERMINATING'
 
     if 'LifecycleTransition' in message and message['LifecycleTransition'] == termination_msg and INSTANCE_ID == message['EC2InstanceId']:
