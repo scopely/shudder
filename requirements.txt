@@ -1,3 +1,4 @@
 boto3==1.7.58
 toml==0.9.4
 requests==2.4.3
+datadog==0.16.0

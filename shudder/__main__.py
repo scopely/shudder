@@ -16,6 +16,7 @@
 import shudder.queue as queue
 import shudder.metadata as metadata
 from shudder.config import CONFIG, LOG_FILE
+from datadog import DogStatsd
 import time
 import requests
 import signal
@@ -25,6 +26,8 @@ import logging
 from requests.exceptions import ConnectionError
 
 logging.basicConfig(filename=LOG_FILE, format='%(asctime)s %(levelname)s:%(message)s', level=logging.INFO)
+
+HEARTBEAT_METRIC = "attribution_gate.graceful_shutdown.heartbeat"
 
 
 def receive_signal(signum, stack):
@@ -38,10 +41,11 @@ def receive_signal(signum, stack):
 def run_commands():
     for command in CONFIG["commands"]:
         try:
+            statsd.gauge(HEARTBEAT_METRIC, 1)
             logging.info('Running command: %s' % command)
             process = subprocess.Popen(command)
             while process.poll() is None:
-                time.sleep(30)
+                time.sleep(5)
                 """Send a heart beat to aws"""
                 logging.info("sending a heart beat to aws")
                 queue.record_lifecycle_action_heartbeat(message)
@@ -58,8 +62,10 @@ if __name__ == '__main__':
 
     sqs_connection, sqs_queue = queue.create_queue()
     sns_connection, subscription_arn = queue.subscribe_sns(sqs_queue)
+    statsd = DogStatsd()
     while True:
         try:
+            statsd.gauge(HEARTBEAT_METRIC, 1)
             message = queue.poll_queue(sqs_connection, sqs_queue)
             if message or metadata.poll_instance_metadata():
                 logging.info("starting graceful shutdown..")
